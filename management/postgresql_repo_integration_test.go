@@ -22,9 +22,9 @@ func TestPostgresqlRepo(t *testing.T) {
 						('stepa',  44.842465, 20.380679), 
 						('john', 51.507322, -0.127647);`)
 
-	repo := PostgresqlRepo{DB: db}
+	repo := UserRepo{DB: db}
 
-	for desc, testFunc := range map[string]func(*testing.T, *PostgresqlRepo){
+	for desc, testFunc := range map[string]func(*testing.T, *UserRepo){
 		"test find all users":       FindAll,
 		"test update user location": UpdateUserLocation,
 	} {
@@ -34,14 +34,14 @@ func TestPostgresqlRepo(t *testing.T) {
 	}
 }
 
-func FindAll(t *testing.T, repo *PostgresqlRepo) {
+func FindAll(t *testing.T, repo *UserRepo) {
 	users := repo.FindAll()
 	if len(users) == 0 {
 		t.Error("error")
 	}
 }
 
-func UpdateUserLocation(t *testing.T, repo *PostgresqlRepo) {
+func UpdateUserLocation(t *testing.T, repo *UserRepo) {
 	repo.UpdateUserLocation(&User{Name: "stepa", UserLocation: &Location{Latitude: 69, Longitude: 420}})
 	repo.UpdateUserLocation(&User{Name: "weirdo", UserLocation: &Location{Latitude: -69, Longitude: -420}})
 	users := repo.FindAll()

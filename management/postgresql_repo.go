@@ -5,11 +5,11 @@ import (
 	"log"
 )
 
-type PostgresqlRepo struct {
+type UserRepo struct {
 	DB *sql.DB
 }
 
-func (p *PostgresqlRepo) FindAll() []User {
+func (p *UserRepo) FindAll() []User {
 	users := make([]User, 0)
 
 	s, err := p.DB.Prepare("SELECT * FROM users")
@@ -38,7 +38,7 @@ func (p *PostgresqlRepo) FindAll() []User {
 	return users
 }
 
-func (p *PostgresqlRepo) UpdateUserLocation(user *User) {
+func (p *UserRepo) UpdateUserLocation(user *User) {
 	st, err := p.DB.Prepare("SELECT * FROM users WHERE user_name=$1;")
 
 	if err != nil {

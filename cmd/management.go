@@ -17,10 +17,11 @@ func main() {
 	user := os.Getenv("POSTGRES_USER")
 	pwd := os.Getenv("POSTGRES_PASSWORD")
 	loc := os.Getenv("POSTGRES_LOCATION")
+	dbName := os.Getenv("POSTGRES_DB_NAME")
 
-	log.Print("establishing connection with db")
+	log.Print("...establishing connection with db...")
 
-	dataSourceName := fmt.Sprintf("postgres://%s:%s@%s/postgres?sslmode=disable", user, pwd, loc)
+	dataSourceName := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=disable", user, pwd, loc, dbName)
 	db, err := sql.Open("postgres", dataSourceName)
 	if err != nil {
 		log.Fatal(err)
@@ -30,8 +31,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	} else {
-		log.Print("connection established")
+		log.Print("OK - db connection established!")
 	}
+
+	db.Exec("CREATE TABLE IF NOT EXISTS users (user_name varchar PRIMARY KEY, latitude float, longitude float);")
 
 	echoServer := management.LocationManagementServer(db)
 	echoServer.Logger.Fatal(echoServer.Start(":8082"))

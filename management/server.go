@@ -8,7 +8,7 @@ import (
 )
 
 func LocationManagementServer(db *sql.DB) *echo.Echo {
-	l := LocationService{Repository: &PostgresqlRepo{db}, UserFinder: &HaversineUserFinder{}}
+	l := LocationService{Repository: &UserRepo{db}, UserFinder: &HaversineUserFinder{}}
 	e := echo.New()
 	e.POST("/location", func(c echo.Context) error {
 		u := new(User)
@@ -16,13 +16,13 @@ func LocationManagementServer(db *sql.DB) *echo.Echo {
 			return err
 		}
 		if !ValidateUserName(u.Name) {
-			c.String(400, "username - 4-16 symbols (a-zA-Z0-9 symbols are acceptable)")
+			return c.String(400, "username: 4-16 symbols (a-zA-Z0-9 symbols are acceptable)")
 		}
 		if _, err := ValidateLatitudeAndGet(fmt.Sprintf("%f", u.UserLocation.Latitude)); err != nil {
-			c.String(400, "latitude: "+err.Error())
+			return c.String(400, "latitude: "+err.Error())
 		}
 		if _, err := ValidateLongitudeAndGet(fmt.Sprintf("%f", u.UserLocation.Longitude)); err != nil {
-			c.String(400, "longitude: "+err.Error())
+			return c.String(400, "longitude: "+err.Error())
 		}
 		l.UpdateUserLocation(u)
 		return c.NoContent(200)
@@ -38,15 +38,15 @@ func LocationManagementServer(db *sql.DB) *echo.Echo {
 		}
 		lat, err := ValidateLatitudeAndGet(latitude)
 		if err != nil {
-			c.String(400, "latitude: "+err.Error())
+			return c.String(400, "latitude: "+err.Error())
 		}
 		lon, err := ValidateLongitudeAndGet(longitude)
 		if err != nil {
-			c.String(400, "longitude: "+err.Error())
+			return c.String(400, "longitude: "+err.Error())
 		}
 		rad, err := ValidateRadiusAndGet(radius)
 		if err != nil {
-			c.String(400, "radius: "+err.Error())
+			return c.String(400, "radius: "+err.Error())
 		}
 		users := l.SearchUsersNearby(&Location{Latitude: lat, Longitude: lon}, rad)
 		return c.JSON(200, users)
