@@ -2,9 +2,7 @@ package management
 
 import (
 	"database/sql"
-	"log"
-	"regexp"
-	"strconv"
+	"fmt"
 
 	"github.com/labstack/echo/v4"
 )
@@ -17,7 +15,15 @@ func LocationManagementServer(db *sql.DB) *echo.Echo {
 		if err := c.Bind(u); err != nil {
 			return err
 		}
-
+		if !ValidateUserName(u.Name) {
+			c.String(400, "username - 4-16 symbols (a-zA-Z0-9 symbols are acceptable)")
+		}
+		if _, err := ValidateLatitudeAndGet(fmt.Sprintf("%f", u.UserLocation.Latitude)); err != nil {
+			c.String(400, "latitude: "+err.Error())
+		}
+		if _, err := ValidateLongitudeAndGet(fmt.Sprintf("%f", u.UserLocation.Longitude)); err != nil {
+			c.String(400, "longitude: "+err.Error())
+		}
 		l.UpdateUserLocation(u)
 		return c.NoContent(200)
 	})
@@ -30,19 +36,17 @@ func LocationManagementServer(db *sql.DB) *echo.Echo {
 		if latitude == "" || longitude == "" || radius == "" {
 			return c.String(400, "Provide latitude, longitude and radius as query params")
 		}
-
-		coordRegex := regexp.MustCompile(`^-?(90|[-8]?\d(\.\d+)?), -?(180|[01]?[-7]?\d(\.\d+)?)$`)
-		lat, err := strconv.ParseFloat(latitude, 64)
+		lat, err := ValidateLatitudeAndGet(latitude)
 		if err != nil {
-			log.Fatal(err)
+			c.String(400, "latitude: "+err.Error())
 		}
-		lon, err := strconv.ParseFloat(longitude, 64)
+		lon, err := ValidateLongitudeAndGet(longitude)
 		if err != nil {
-			log.Fatal(err)
+			c.String(400, "longitude: "+err.Error())
 		}
-		rad, err := strconv.ParseFloat(radius, 64)
+		rad, err := ValidateRadiusAndGet(radius)
 		if err != nil {
-			log.Fatal(err)
+			c.String(400, "radius: "+err.Error())
 		}
 		users := l.SearchUsersNearby(&Location{Latitude: lat, Longitude: lon}, rad)
 		return c.JSON(200, users)
