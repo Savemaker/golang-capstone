@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"location/management"
+	m "location/management"
 
 	_ "github.com/lib/pq"
 )
@@ -36,6 +36,7 @@ func main() {
 
 	db.Exec("CREATE TABLE IF NOT EXISTS users (user_name varchar PRIMARY KEY, latitude float, longitude float);")
 
-	echoServer := management.LocationManagementServer(db)
+	locationService := m.LocationService{Repository: &m.UserRepo{DB: db}, UserFinder: &m.HaversineUserFinder{}}
+	echoServer := m.LocationServiceServerSetup(&locationService)
 	echoServer.Logger.Fatal(echoServer.Start(":8082"))
 }

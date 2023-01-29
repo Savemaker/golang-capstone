@@ -36,22 +36,22 @@ func radiusValidation(t *testing.T) {
 
 func userNameValidation(t *testing.T) {
 	testCases := []struct {
-		input   string
-		isValid bool
+		input string
+		err   error
 	}{
-		{input: "stepa", isValid: true},
-		{input: "1234", isValid: true},
-		{input: "abcdef3hjklm7opq", isValid: true},
-		{input: "AbCdE5", isValid: true},
-		{input: "abcdef3hjklm7opq1", isValid: false},
-		{input: "123", isValid: false},
-		{input: "", isValid: false},
-		{input: "@&2323", isValid: false},
+		{input: "stepa"},
+		{input: "1234"},
+		{input: "abcdef3hjklm7opq"},
+		{input: "AbCdE5"},
+		{input: "abcdef3hjklm7opq1", err: ErrUserNameNotValid},
+		{input: "123", err: ErrUserNameNotValid},
+		{input: "", err: ErrUserNameNotValid},
+		{input: "@&2323", err: ErrUserNameNotValid},
 	}
 	for _, testCase := range testCases {
 		output := ValidateUserName(testCase.input)
-		if testCase.isValid != output {
-			t.Errorf("expected %v for input=%v", testCase.isValid, testCase.input)
+		if testCase.err != output {
+			t.Errorf("expected %v for input=%v", testCase.err.Error(), testCase.input)
 		}
 	}
 }

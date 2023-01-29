@@ -14,6 +14,7 @@ var (
 	ErrLatitudeBoundary  = errors.New("latitude is not withing -90 90 degrees range")
 	ErrLongitudeBoundary = errors.New("longitude is not withing -180 180 degrees range")
 	ErrRadiusNegative    = errors.New("radius is not positive")
+	ErrUserNameNotValid  = errors.New("username: 4-16 symbols (a-zA-Z0-9 symbols are acceptable)")
 )
 
 func ValidateLatitudeAndGet(latitude string) (float64, error) {
@@ -42,9 +43,13 @@ func ValidateLongitudeAndGet(longitude string) (float64, error) {
 	return lon, err
 }
 
-func ValidateUserName(userName string) bool {
+func ValidateUserName(userName string) error {
 	userNameRegex := regexp.MustCompile(`^[a-zA-Z0-9]{4,16}$`)
-	return userNameRegex.MatchString(userName)
+	if userNameRegex.MatchString(userName) {
+		return nil
+	} else {
+		return ErrUserNameNotValid
+	}
 }
 
 func ValidateDigitsOfCoordAfterPoint(coord string) error {
