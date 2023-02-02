@@ -44,8 +44,8 @@ func (h *handler) GetUsers(c echo.Context) error {
 	longitude := c.QueryParam("longitude")
 	radius := c.QueryParam("radius")
 
-	if latitude == "" || longitude == "" || radius == "" {
-		return c.JSON(400, ErrorResponse{Reason: "provide latitude, longitude and radius as query params"})
+	if err := ValidateRequestParams(latitude, longitude, radius); err != nil {
+		return c.JSON(400, ErrorResponse{Reason: err.Error()})
 	}
 	lat, err := ValidateLatitudeAndGet(latitude)
 	if err != nil {

@@ -15,7 +15,23 @@ var (
 	ErrLongitudeBoundary = errors.New("longitude is not withing -180 180 degrees range")
 	ErrRadiusNegative    = errors.New("radius is not positive")
 	ErrUserNameNotValid  = errors.New("username: 4-16 symbols (a-zA-Z0-9 symbols are acceptable)")
+	ErrNoLatitude        = errors.New("provide latitude as a query param")
+	ErrNoLongitude       = errors.New("provide longitude as a query param")
+	ErrNoRadius          = errors.New("provide radius as a query param")
 )
+
+func ValidateRequestParams(latitude, longitude, radius string) error {
+	if latitude == "" {
+		return ErrNoLatitude
+	}
+	if longitude == "" {
+		return ErrNoLongitude
+	}
+	if radius == "" {
+		return ErrNoRadius
+	}
+	return nil
+}
 
 func ValidateLatitudeAndGet(latitude string) (float64, error) {
 	lat, err := strconv.ParseFloat(latitude, 64)

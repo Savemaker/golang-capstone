@@ -6,12 +6,31 @@ import (
 
 func TestValidator(t *testing.T) {
 	for testDesc, testFunc := range map[string]func(t *testing.T){
-		"validate user name tests": userNameValidation,
-		"validate latitude tests":  latitudeValidation,
-		"validate longitude tests": longitudeValidation,
-		"validate radius tests":    radiusValidation,
+		"validate request params presence": requestParamsValidation,
+		"validate user name tests":         userNameValidation,
+		"validate latitude tests":          latitudeValidation,
+		"validate longitude tests":         longitudeValidation,
+		"validate radius tests":            radiusValidation,
 	} {
 		t.Run(testDesc, testFunc)
+	}
+}
+
+func requestParamsValidation(t *testing.T) {
+	testCases := []struct {
+		latitude, longitude, radius string
+		expectedError               error
+	}{
+		{latitude: "0.000000", longitude: "0.000000", radius: "112.3"},
+		{latitude: "", longitude: "0.000000", radius: "112.3", expectedError: ErrNoLatitude},
+		{latitude: "0.00000", longitude: "", radius: "112.3", expectedError: ErrNoLongitude},
+		{latitude: "0.00000", longitude: "0.0000000", radius: "", expectedError: ErrNoRadius},
+	}
+	for _, testCase := range testCases {
+		err := ValidateRequestParams(testCase.latitude, testCase.longitude, testCase.radius)
+		if err != testCase.expectedError {
+			t.Errorf("expected %v but got %v", testCase.expectedError, err)
+		}
 	}
 }
 
