@@ -32,7 +32,10 @@ func (h *handler) PostLocation(c echo.Context) error {
 	if _, err := ValidateLongitudeAndGet(fmt.Sprintf("%f", u.UserLocation.Longitude)); err != nil {
 		return c.JSON(400, ErrorResponse{Reason: "longitude: " + err.Error()})
 	}
-	h.locationService.UpdateUserLocation(u)
+	err := h.locationService.UpdateUserLocation(u)
+	if err == ErrInternalServerError {
+		return c.JSON(500, err.Error())
+	}
 	return c.NoContent(200)
 }
 
@@ -56,6 +59,9 @@ func (h *handler) GetUsers(c echo.Context) error {
 	if err != nil {
 		return c.JSON(400, ErrorResponse{Reason: err.Error()})
 	}
-	users := h.locationService.SearchUsersNearby(&Location{Latitude: lat, Longitude: lon}, rad)
+	users, err := h.locationService.SearchUsersNearby(&Location{Latitude: lat, Longitude: lon}, rad)
+	if err == ErrInternalServerError {
+		return c.JSON(500, err.Error())
+	}
 	return c.JSON(200, Response{Users: users})
 }

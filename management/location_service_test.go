@@ -53,7 +53,7 @@ func TestLocationService(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.description, func(t *testing.T) {
-			foundUsers := locationService.SearchUsersNearby(testCase.location, testCase.radius)
+			foundUsers, _ := locationService.SearchUsersNearby(testCase.location, testCase.radius)
 			if len(foundUsers) != testCase.expectedUsersCount {
 				t.Errorf("expected %v but found %v", testCase.expectedUsersCount, len(foundUsers))
 			}

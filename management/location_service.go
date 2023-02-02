@@ -6,8 +6,8 @@ type LocationService struct {
 }
 
 type LocationRepository interface {
-	FindAll() []User
-	UpdateUserLocation(user *User)
+	FindAll() ([]User, error)
+	UpdateUserLocation(user *User) error
 }
 
 type UserFinderService interface {
@@ -25,16 +25,20 @@ type Location struct {
 	Longitude float64 `json:"longitude"`
 }
 
-func (l *LocationService) SearchUsersNearby(location *Location, radius float64) []User {
+func (l *LocationService) SearchUsersNearby(location *Location, radius float64) ([]User, error) {
 	foundUsers := make([]User, 0)
-	for _, user := range l.Repository.FindAll() {
+	users, err := l.Repository.FindAll()
+	if err != nil {
+		return foundUsers, err
+	}
+	for _, user := range users {
 		if l.UserFinder.IsUserWithinRangeOfLocation(&user, location, radius) {
 			foundUsers = append(foundUsers, user)
 		}
 	}
-	return foundUsers
+	return foundUsers, nil
 }
 
-func (l *LocationService) UpdateUserLocation(user *User) {
-	l.Repository.UpdateUserLocation(user)
+func (l *LocationService) UpdateUserLocation(user *User) error {
+	return l.Repository.UpdateUserLocation(user)
 }

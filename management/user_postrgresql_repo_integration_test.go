@@ -43,7 +43,7 @@ func TestPostgresqlRepo(t *testing.T) {
 }
 
 func FindAll(t *testing.T, repo *UserRepo) {
-	users := repo.FindAll()
+	users, _ := repo.FindAll()
 	if len(users) == 0 {
 		t.Error("expected more than 0 users")
 	}
@@ -52,7 +52,7 @@ func FindAll(t *testing.T, repo *UserRepo) {
 func UpdateUserLocation(t *testing.T, repo *UserRepo) {
 	repo.UpdateUserLocation(&User{Name: "stepa", UserLocation: &Location{Latitude: 69, Longitude: 420}})
 	repo.UpdateUserLocation(&User{Name: "weirdo", UserLocation: &Location{Latitude: -69, Longitude: -420}})
-	users := repo.FindAll()
+	users, _ := repo.FindAll()
 	if len(users) != 3 {
 		t.Error("expected 3 users")
 	}
