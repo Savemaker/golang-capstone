@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+option go_package= "location/proto";
+
+service LocationManagement {
+    rpc CalculateDistance (CalculateDistanceRequest) returns (CalculateDistanceResponse);
+}
+
+service LocationHistory {
+    rpc SaveUserLocation (SaveUserLocationRequest) returns (SaveUserLocationResponse);
+}
+
+message CalculateDistanceRequest {
+    repeated Location location = 1; 
+}
+
+message Distance {
+    double distance = 1;
+}
+
+message CalculateDistanceResponse {
+    Distance distance = 1;
+}
+
+message User {
+    string username = 1;
+}
+
+message Location {
+    double latitude = 1;
+    double longitude = 2;
+}
+
+message Date {
+    string date = 1;
+}
+
+message SaveUserLocationRequest {
+    User user = 1;
+    Location location = 2;
+    Date date = 3;
+}
+
+message SaveUserLocationResponse {
+
+}
